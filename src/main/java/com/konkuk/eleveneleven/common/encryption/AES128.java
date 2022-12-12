@@ -52,7 +52,7 @@ public class AES128 {
             byte[] encrypted = encryptCipher.doFinal(str.getBytes("UTF-8"));
             return new String(Base64.encodeBase64(encrypted));
         } catch (Exception e) {
-            throw new BaseException(BaseResponseStatus.FAIL_ENCRYPT, "AES128 암호화 하는 과정에를 예외가 터졌습니다.");
+            throw new BaseException(BaseResponseStatus.FAIL_ENCRYPT, "AES128 암호화 하는 과정에서 예외가 터졌습니다.");
         }
     }
 

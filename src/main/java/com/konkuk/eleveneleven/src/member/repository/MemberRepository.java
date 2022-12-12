@@ -18,6 +18,9 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     @Query("select m from Member m where m.kakaoId=:kakaoId")
     Member findByKakaoId(@Param("kakaoId") Long kakaoId);
 
+    @Query("select m.kakaoId from Member m where m.kakaoId=:kakaoId")
+    Optional<Member> findOptionalByKakaoId(@Param("kakaoId") Long kakaoId);
+
     @Query("select m from Member m where m.kakaoId=:kakaoId")
     Optional<Member> findByKakaoIdOptional(@Param("kakaoId") Long kakaoId);
 

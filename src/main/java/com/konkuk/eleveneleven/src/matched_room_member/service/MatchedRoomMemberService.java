@@ -23,8 +23,9 @@ import java.util.stream.Collectors;
 public class MatchedRoomMemberService {
 
     private final MemberRepository memberRepository;
-    private final MatchedRoomMemberRepository matchedRoomMemberRepository;
     private final MatchedRoomRepository matchedRoomRepository;
+    private final MatchedRoomMemberRepository matchedRoomMemberRepository;
+
 
     public List<Member> getMatchedRoomMember(Long memberIdx){
         MatchedRoom matchedRoom = getMatchedRoom(memberIdx);
@@ -70,43 +71,28 @@ public class MatchedRoomMemberService {
     /** [MathcedRoom에서 나가는 API ]*/
     public DeleteMatchedRoomMemberDto goOutMatchedRoom(Long memberIdx, Long matchedRoomIdx){
 
-        Member member = memberRepository.findByMemberIdx(memberIdx);
-
         //1. 그 MathcedRoom에 그 Member가 속해있는지 검사
-        MatchedRoomMember matchedRoomMember = matchedRoomMemberRepository.findByMemberIdxAndMatchedRoomIdxAndStatus(memberIdx, matchedRoomIdx, Status.ACTIVE)
-                .orElseThrow(
-                        () -> {
-                            throw new BaseException(BaseResponseStatus.IS_NOT_BELEONG_TO_MATCHED_ROOM, "matched room 삭제 시점 : 방을 나가려는 해당 사용자는 , 사실 해당 MathcedRoom에 속한 사용자가 아닙니다.");
-                        }
-                );
-
-        boolean isOwner = matchedRoomMember.getMatchedRoom().getOwnerMember().getIdx().equals(memberIdx);
-
-
-        //2_1. 방장인 경우 방까지 삭제
-        if(isOwner){
-
-            MatchedRoom matchedRoom = matchedRoomRepository.findById(matchedRoomIdx).orElseThrow(
-                    () -> {
-                        throw new BaseException(BaseResponseStatus.ALREADY_DELETE_MATCHED_ROOM, "matched room 삭제 시점 : 해당 matched Room은 이미 삭제되었습니다.");
-                    }
-            );
-
-            matchedRoom.getMatchedRoomMemberList().stream().forEach(mrm -> matchedRoomMemberRepository.delete(mrm));
-           matchedRoomRepository.delete(matchedRoom);
+        if(!matchedRoomMemberRepository.existsByMemberIdxAndMatchedRoomIdxAndStatus(memberIdx, matchedRoomIdx, Status.ACTIVE)){
+            throw new BaseException(BaseResponseStatus.IS_NOT_BELEONG_TO_MATCHED_ROOM, "matched room 삭제 시점 : 방을 나가려는 해당 사용자는 , 사실 해당 MathcedRoom에 속한 사용자가 아닙니다.");
         }
-        else{
-            //2_2. 방장이 아닌 경우 그 RoomMember만 delete
-            matchedRoomMemberRepository.delete(matchedRoomMember);
 
+
+        //2_1. 일단 그 매칭룸에 남아있는 회원을 삭제
+        MatchedRoomMember matchedRoomMember = matchedRoomMemberRepository.findOne(memberIdx, matchedRoomIdx, Status.ACTIVE);
+        matchedRoomMemberRepository.delete(matchedRoomMember);
+
+        //2_2. 그 매칭룸에 남아있는 회원이 자기 혼자였다면 -> 마지막에 그 매칭룸까지 삭제
+        Long countOfMatchedRoomMember = matchedRoomRepository.findCountOfMatchedRoom(matchedRoomIdx);
+        if(countOfMatchedRoomMember.equals(0L)){
+            MatchedRoom matchedRoom = matchedRoomRepository.findOne(matchedRoomIdx);
+            matchedRoomRepository.delete(matchedRoom);
         }
+
 
         //3. 리턴
         return DeleteMatchedRoomMemberDto.builder()
                 .memberIdx(memberIdx)
-                .name(member.getName())
-                .owner(isOwner)
-                .matchedRoomIdx(isOwner ? -1L : matchedRoomIdx)
+                .matchedRoomIdx(countOfMatchedRoomMember.equals(0L) ? -1L : matchedRoomIdx)
                 .build();
     }
 

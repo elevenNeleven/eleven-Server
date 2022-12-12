@@ -19,6 +19,7 @@ import java.util.Optional;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class AuthService {
 
     private final MemberRepository memberRepository;
@@ -46,6 +47,7 @@ public class AuthService {
         }
 
     }
+
 
     public void postAuthMeta(Long memberIdx, PostAuthMetaReqDto postAuthMetaReqDto){
 
