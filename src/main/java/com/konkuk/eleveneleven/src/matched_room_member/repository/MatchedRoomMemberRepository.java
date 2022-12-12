@@ -20,9 +20,9 @@ public interface MatchedRoomMemberRepository extends JpaRepository<MatchedRoomMe
 
     List<MatchedRoomMember> findAllByMatchedRoomAndStatus(MatchedRoom matchedRoom, Status status);
 
-    @Query("select mrm from MatchedRoomMember mrm where mrm.member.idx=:memberIdx " +
-            "and mrm.matchedRoom.idx=:matchedRoomIdx and mrm.status=:status")
-    Optional<MatchedRoomMember> findByMemberIdxAndMatchedRoomIdxAndStatus(@Param("memberIdx") Long memberIdx,
-                                                                          @Param("matchedRoomIdx") Long matchedRoomIdx,
-                                                                          @Param("status")Status status);
+
+    @Query("select mrm from MatchedRoomMember mrm where mrm.member.idx=:memberIdx and mrm.matchedRoom.idx=:matchedRoomIdx and mrm.status=:status")
+    MatchedRoomMember findOne(@Param("memberIdx") Long memberIdx, @Param("matchedRoomIdx") Long matchedRoomIdx,
+                              @Param("status") Status status);
+
 }

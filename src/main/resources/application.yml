@@ -38,7 +38,7 @@ spring:
   jpa:
     open-in-view: true # open session in view 를 true로 설정하므로써 -> 트랜잭션 범위 내에서만 SQL이 나가게 된다. -> 즉 SQL이 남발하여 나가는 상황을 막게 됨
     hibernate:
-      ddl-auto: none
+      ddl-auto: validate
     properties:
       hibernate:
         #        show_sql: true

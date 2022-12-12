@@ -2,6 +2,7 @@ package com.konkuk.eleveneleven.common.interceptor;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.konkuk.eleveneleven.common.encryption.AES128;
+import com.konkuk.eleveneleven.common.encryption.AES256;
 import com.konkuk.eleveneleven.config.BaseResponse;
 import com.konkuk.eleveneleven.config.BaseResponseStatus;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +23,7 @@ import java.util.Optional;
 public class FirstAuthInterceptor implements HandlerInterceptor {
 
     private boolean returnValue;
-    private final AES128 aes128;
+    private final AES256 aes256;
     private ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
@@ -38,7 +39,12 @@ public class FirstAuthInterceptor implements HandlerInterceptor {
     }
 
     private Boolean sendSuccess(HttpServletRequest request, HttpServletResponse response, String encryptedKakaoId){
-        Long kakaoId = Long.parseLong(aes128.decrypt(encryptedKakaoId));
+        Long kakaoId = null;
+        try {
+            kakaoId = Long.parseLong(aes256.decrypt(encryptedKakaoId));
+        } catch (Exception e) {
+            sendFail(response, BaseResponseStatus.FAIL_DECRYPT);
+        }
 
         request.setAttribute("kakaoId", kakaoId);
         this.returnValue = true;

@@ -8,7 +8,5 @@ import lombok.*;
 @Builder
 public class DeleteMatchedRoomMemberDto {
     private Long memberIdx;
-    private String name;
-    private boolean owner;
     private Long matchedRoomIdx;
 }

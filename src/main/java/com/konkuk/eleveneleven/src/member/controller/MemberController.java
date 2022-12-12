@@ -1,8 +1,11 @@
 package com.konkuk.eleveneleven.src.member.controller;
 
 import com.konkuk.eleveneleven.common.encryption.AES128;
+import com.konkuk.eleveneleven.common.encryption.AES256;
 import com.konkuk.eleveneleven.common.jwt.JwtUtil;
+import com.konkuk.eleveneleven.config.BaseException;
 import com.konkuk.eleveneleven.config.BaseResponse;
+import com.konkuk.eleveneleven.config.BaseResponseStatus;
 import com.konkuk.eleveneleven.src.member.dto.EmailAuthDto;
 import com.konkuk.eleveneleven.src.member.dto.EmailDto;
 import com.konkuk.eleveneleven.src.member.dto.LoginMemberDto;
@@ -16,20 +19,38 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+
 @Slf4j
 @RestController
 @RequiredArgsConstructor
 public class MemberController {
 
     private final MemberService memberService;
-    private final JwtUtil jwtUtil;
-    private final AES128 aes128;
+    private final AES256 aes256;
 
-    @GetMapping("/aes")
-    public String aes(@RequestParam String str){
-        String encryptedPath = aes128.encrypt(str);
-        return encryptedPath;
-    }
+//    @GetMapping("/aes")
+//    public String aes(@RequestParam String str){
+//        String encryptedPath = "";
+//        try {
+//            encryptedPath = aes256.encrypt(str);
+//        } catch (Exception e) {
+//            throw new BaseException(BaseResponseStatus.ENCRYPT_FAIL, "AES256 암호화 시점에서 에러 터짐");
+//        }
+//        return encryptedPath;
+//    }
+//
+//    @GetMapping("/aes/decryption")
+//    public String decryption(@RequestParam String str){
+//        String decryptedPath = null;
+//        try {
+//            decryptedPath = aes256.decrypt(str);
+//        } catch (Exception e) {
+//            throw new BaseException(BaseResponseStatus.FAIL_DECRYPT, "AES256 복호화 시점에서 에러 터짐");
+//        }
+//        return decryptedPath;
+//    }
 
     /**
      * [API. 2] : 로그인 API

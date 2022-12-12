@@ -57,9 +57,9 @@ public class MatchedRoomMemberController {
 
 
     /** [MathcedRoom에서 나가는 API ] */
-    @DeleteMapping("/matched/room/member/{matchedRoomIdx}")
-    public BaseResponse<DeleteMatchedRoomMemberDto> deleteMatchedRoom(@RequestAttribute Long memberIdx,
-                                                                      @PathVariable Long matchedRoomIdx){
+    @DeleteMapping("/member/{matchedRoomIdx}")
+    public BaseResponse<DeleteMatchedRoomMemberDto> deleteMatchedRoomMember(@RequestAttribute Long memberIdx,
+                                                                            @PathVariable Long matchedRoomIdx){
         return new BaseResponse<>(matchedRoomMemberService.goOutMatchedRoom(memberIdx, matchedRoomIdx));
     }
 

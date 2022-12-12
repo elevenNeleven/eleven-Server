@@ -2,6 +2,7 @@ package com.konkuk.eleveneleven.common.interceptor;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.konkuk.eleveneleven.common.encryption.AES128;
+import com.konkuk.eleveneleven.common.encryption.AES256;
 import com.konkuk.eleveneleven.config.BaseResponse;
 import com.konkuk.eleveneleven.config.BaseResponseStatus;
 import com.konkuk.eleveneleven.src.member.repository.MemberRepository;
@@ -25,7 +26,7 @@ public class BeforeAuthInterceptor implements HandlerInterceptor {
     private final MemberRepository memberRepository;
     private boolean returnValue;
     private boolean testResultValue;
-    private final AES128 aes128;
+    private final AES256 aes256;
     private ObjectMapper objectMapper = new ObjectMapper();
 
 
@@ -55,7 +56,12 @@ public class BeforeAuthInterceptor implements HandlerInterceptor {
     }
 
     private Boolean sendSuccess(HttpServletRequest request, HttpServletResponse response, String encryptedKakaoId){
-        Long kakaoId = Long.parseLong(aes128.decrypt(encryptedKakaoId));
+        Long kakaoId = null;
+        try {
+            kakaoId = Long.parseLong(aes256.decrypt(encryptedKakaoId));
+        } catch (Exception e) {
+            sendFail(response, BaseResponseStatus.FAIL_DECRYPT);
+        }
 
         if(!memberRepository.existsByKakaoId(kakaoId)){
             sendFail(response, BaseResponseStatus.INVALID_KAKAO_ID);
